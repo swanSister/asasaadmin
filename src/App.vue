@@ -1,19 +1,47 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" style="height:100%; width:100%; margin:0; padding:0;">
+    <router-view style="height:100%; width:100%;"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import { polyfill } from 'es6-promise'
+polyfill()
+
+import Vue from 'vue'
+import vuescroll from 'vuescroll'
+
+Vue.use(vuescroll, {
+  ops: {
+    // The global config
+  }
+});
+Vue.prototype.$vuescrollConfig = {
+  bar: {
+    background: '#000'
+  }
+};
+
+import "@/assets/css/main.css"
+import "@/assets/css/fontello.css"
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+   data: function () {
+    return {
+      varUA:null,
+    }
+  },
+  methods:{
+    
+  },
+  mounted:function(){
+    
   }
 }
+
+
 </script>
 
 <style>
@@ -22,7 +50,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
   margin-top: 60px;
+ 
 }
 </style>

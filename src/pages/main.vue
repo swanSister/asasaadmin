@@ -5,7 +5,7 @@
      <div class="flex column justify-content-center uncertified-user-list">
        <div class="flex column" v-for="(item, index) in unCertifiedUserList " :key="'unCertifiedUser'+index">
          <div class="addr">{{item.fields.addressData.address}}</div>
-         <img class="addr-img" :src="item.fields.authImgSrc">
+         <img class="addr-img" :src="item.fields.authImgSrc ? item.fields.authImgSrc['img_0'] : ''">
          <input class="comment" placeholder="거절사유를 입력해 주세요." v-bind="reason"/>
          <div class="btn-content flex justify-content-center">
            <div class="flex auto justify-content-center accept" @click="createAuth(item,true)">승인</div>
@@ -53,6 +53,7 @@ export default {
       })
       console.log('patchRes',patchRes)
       this.getUncertifiedUsers()
+      
     }
   },
   async mounted(){
@@ -99,7 +100,7 @@ export default {
 .uncertified-user-list .btn-content{
   font-size: 4vw;
   color:white;
-  margin-bottom: 6vw;
+  margin-bottom: 12vw;
 }
 .uncertified-user-list .btn-content div{
   padding:2vw;

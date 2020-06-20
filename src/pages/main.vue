@@ -3,10 +3,14 @@
     <vuescroll class="main-content">
     <div class="title"> 인증 요청</div>
      <div class="flex column justify-content-center uncertified-user-list">
-       <div class="flex column" v-for="(item, index) in unCertifiedUserList " :key="'unCertifiedUser'+index">
+       <div  class="flex column" v-for="(item, index) in unCertifiedUserList " :key="'unCertifiedUser'+index">
          <div class="addr">{{item.fields.addressData.address}}</div>
+         <div>
+          <span class="building-name">{{item.fields.buildingName}}</span>
+          <span class="house-type">{{item.fields.houseType.name}}</span>
+         </div>
          <img class="addr-img" :src="item.fields.authImgSrc ? item.fields.authImgSrc['img_0'] : ''">
-         <input class="comment" placeholder="거절사유를 입력해 주세요." v-bind="reason"/>
+         <input class="comment" placeholder="거절사유를 입력해 주세요." v-model="item.fields.reason"/>
          <div class="btn-content flex justify-content-center">
            <div class="flex auto justify-content-center accept" @click="createAuth(item,true)">승인</div>
            <div class="flex auto justify-content-center reject" @click="createAuth(item,false)">거절</div>
@@ -31,7 +35,6 @@ export default {
       unCertifiedUserList:[],
       offset:0,
       limit:10,
-      reason:''
     }
   },
   methods:{
@@ -39,11 +42,14 @@ export default {
       let res = await this.$api.getByPathWhere('users',`isAuth=false&offset=${this.offset}&limit=${this.limit}`)
 
       this.unCertifiedUserList = res.data.documents
+      this.unCertifiedUserList = this.unCertifiedUserList.filter(item=> !item.fields.auth)
+      this.unCertifiedUserList.map(item=>item.fields.reason = '')
+      console.log(this.unCertifiedUserList)
     },
     async createAuth(item, isAuthComplete){
       let res = await this.$api.postByPath('auth',{
         isAuthComplete:isAuthComplete,
-        reason:isAuthComplete ? '' : this.reason,
+        reason:isAuthComplete ? '' : item.fields.reason,
         id: item.id,
         path: item.path
       })
@@ -82,13 +88,24 @@ export default {
   font-weight: bold;
   margin-bottom: 2vw;
 }
+.uncertified-user-list .building-name{
+  font-size:6vw;
+  color:tomato;
+  margin-right:4vw;
+}
+.uncertified-user-list .house-type{
+  font-size:5vw;
+  padding:2vw;
+  color:white;
+  background:tomato;
+}
 .uncertified-user-list .addr-img{
   font-size:4vw;
   font-weight: bold;
   width:100%;
   min-height: 40vw;
   height:auto;
-  margin-bottom: 2vw;
+  margin: 4vw 0;
 }
 .uncertified-user-list .comment{
   font-size:4vw;

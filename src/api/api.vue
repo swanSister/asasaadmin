@@ -12,10 +12,8 @@ export default {
      return axios.get(`${API_URL}/${path}?${where}`)
   },
   getByPath: function(path, offset, limit){
-    offset = 0
-    limit = 10
     console.log("##get API : ",path)
-     return axios.get(`${API_URL}/${path}?offset=${offset}&limit=${limit}`)
+     return axios.get(`${API_URL}/${path}?offset=${offset}&limit=${limit}&orderBy=createdAt desc`)
   },
   postByPath: function(path, param){
     console.log("post API : ",path,"data:",param)
@@ -25,6 +23,10 @@ export default {
         Authorization: ''
       }
     })
+  },
+  deleteByPath: function(path, param){
+    console.log("post API : ",path,"data:",param)
+    return axios.delete(`${API_URL}/${path}`)
   },
   patchByPath: function(path, param){
     console.log("post API : ",path,"data:",param)

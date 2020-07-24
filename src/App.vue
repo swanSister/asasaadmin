@@ -1,6 +1,7 @@
 <template>
   <div id="app" style="height:100%; width:100%; margin:0; padding:0;">
     <router-view style="height:100%; width:100%;"/>
+    <loading v-if="isLoadingShow"/>
   </div>
 </template>
 
@@ -28,13 +29,21 @@ import "@/assets/css/fontello.css"
 
 export default {
   name: 'App',
-   data: function () {
+  data: function () {
     return {
       varUA:null,
+       isLoadingShow:false,
     }
   },
   methods:{
-    
+    onShowLoading(){
+      console.log("####onShowLoading")
+      this.isLoadingShow = true
+    },
+    onHideLoading(){
+      console.log("####onHideLoading")
+      this.isLoadingShow = false
+    },
   },
   mounted:function(){
     

@@ -32,11 +32,11 @@
           <div class="flex btn-content justify-content-end">
              <div class="flex none" @click="deleteNotice(item)">삭제</div>
           </div>
-          <div class="title">{{item.fields.title}}</div>
+          <div class="title">{{item.title}}</div>
           
-          <div class="text">{{item.fields.text}}</div>
+          <div class="text">{{item.text}}</div>
           <div class="flex writer-content">
-            <div class="writer">{{item.fields.writer}}</div>
+            <div class="writer">{{item.writerId}}</div>
             <div class="time">{{$moment(item.createdAt).format('YYYY-MM-DD')}}</div>
           </div>
         
@@ -90,13 +90,13 @@ export default {
   methods:{
     async deleteNotice(item){
       if(confirm('공지를 삭제 하시겠습니까?')){
-        await this.$api.deleteByPath(item.path)
+        await this.$api.deleteNotice({noticeId:item.noticeId})
         let that = this
+        this.noticeList = []
         setTimeout(function(){
-          that.noticeList = []
-          that.offset = 0
-          that.getNotice()
+           that.getNotice()
         },300)
+       
       }
     },
     async handleRS(vsInstance, refreshDom, done) {//위로 당겨서 새로고침
@@ -119,10 +119,13 @@ export default {
       done();
     },
     async getNotice(){
-      let res = await this.$api.getByPath('notice',this.offset,this.limit)
-      console.log(res)
-      let noticeList = res.data.documents
-      noticeList.map(item=> this.noticeList.push(item))
+      let res = await this.$api.getNotice({
+        offset:this.offset,
+        limit:this.limit,
+      })
+      console.log("notice list :",res)
+
+      res.data.data.map(item=> this.noticeList.push(item))
     }
   },
   async mounted(){

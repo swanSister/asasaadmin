@@ -5,7 +5,7 @@
         <span @click="$router.go('-1')" class="icon-left-open"></span>
       </div>
       <div class="title flex auto justify-content-center">
-        인증 요청
+        재인증
       </div>
     </div>
     <vuescroll class="auth-content"
@@ -25,14 +25,14 @@
       <div class="slot-refresh" slot="refresh-active"></div>
       <div class="child">
         <div class="flex column justify-content-center uncertified-user-list">
-          <div  class="flex column" v-for="(item, index) in unCertifiedUserList " :key="'unCertifiedUser'+index">
-            <div class="addr">{{item.fields.addressData.address}}</div>
+          <div class="flex column" v-for="(item, index) in unCertifiedUserList " :key="'unCertifiedUser'+index">
+            <div class="addr">{{item.addressData.address}}</div>
             <div>
-              <span class="building-name">{{item.fields.buildingName}}</span>
-              <span class="house-type">{{item.fields.houseType.name}}</span>
+              <span class="building-name">{{item.buildingName}}</span>
+              <span class="house-type">{{item.houseType == 1 ? '아파트' : (item.houseType == 2 ? '오피스텔' : '주택') }}</span>
             </div>
-            <img class="addr-img" :src="item.fields.authImgSrc && item.fields.authImgSrc.files ? item.fields.authImgSrc.files[0] : ''">
-            <input class="comment" placeholder="거절사유를 입력해 주세요." v-model="item.fields.reason"/>
+            <img class="addr-img" :src="item.authImgUrl">
+            <input class="comment" placeholder="거절사유를 입력해 주세요." v-model="reason"/>
             <div class="btn-content flex justify-content-center">
               <div class="flex auto justify-content-center accept" @click="createAuth(item,true)">승인</div>
               <div class="flex auto justify-content-center reject" @click="createAuth(item,false)">거절</div>
@@ -55,6 +55,7 @@ export default {
   },
   data () {
     return {
+      reason:'',
       unCertifiedUserList:[],
       offset:0,
       limit:10,
@@ -108,23 +109,19 @@ export default {
       done();
     },
     async getUncertifiedUsers(){
-      let res = await this.$api.getByPathWhere('users',`isAuth=false&offset=${this.offset}&limit=${this.limit}`)
-      let filtered = res.data.documents.filter(item=> !item.fields.auth)
-      filtered.map(item => this.unCertifiedUserList.push(item))
-      this.unCertifiedUserList.map(item=>item.fields.reason = '')
+      let res = await this.$api.getUncertifiedUsers({offset:this.offset, limit:this.limit})
+      console.log("getUncertifiedUsers:",res)
+      res.data.data.map(item => this.unCertifiedUserList.push(item))
     },
-    async createAuth(item, isAuthComplete){
-      let res = await this.$api.postByPath('auth',{
-        isAuthComplete:isAuthComplete,
-        reason:isAuthComplete ? '' : item.fields.reason,
-        id: item.id,
-        path: item.path
-      })
-      let patchRes = await this.$api.patchByPath(item.path,{
-          isAuth: isAuthComplete,
-          auth: 'ref ' + res.headers.location
-      })
-      console.log('patchRes',patchRes)
+    async createAuth(item, isAuthSuccess){
+      item.isAuthWait = false
+      item.isAuthSuccess = isAuthSuccess
+      if(!item.isAuthSuccess){
+        item.reason = this.reason
+      }
+      let res = await this.$api.setAuth(item)
+      console.log(res)
+
       let that = this
       setTimeout(function(){
         that.unCertifiedUserList = []

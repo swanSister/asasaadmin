@@ -25,29 +25,6 @@ export default {
     }
   },
   methods:{
-    async getUncertifiedUsers(){
-      let res = await this.$api.getByPathWhere('users',`isAuth=false&offset=${this.offset}&limit=${this.limit}`)
-
-      this.unCertifiedUserList = res.data.documents
-      this.unCertifiedUserList = this.unCertifiedUserList.filter(item=> !item.fields.auth)
-      this.unCertifiedUserList.map(item=>item.fields.reason = '')
-      console.log(this.unCertifiedUserList)
-    },
-    async createAuth(item, isAuthComplete){
-      let res = await this.$api.postByPath('auth',{
-        isAuthComplete:isAuthComplete,
-        reason:isAuthComplete ? '' : item.fields.reason,
-        id: item.id,
-        path: item.path
-      })
-      let patchRes = await this.$api.patchByPath(item.path,{
-          isAuth: isAuthComplete,
-          auth: 'ref ' + res.headers.location
-      })
-      console.log('patchRes',patchRes)
-      this.getUncertifiedUsers()
-      
-    }
   },
   async mounted(){
    

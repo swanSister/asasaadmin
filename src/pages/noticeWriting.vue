@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div ref="footer" class="footer flex auto justify-content-start align-items-center;">
+      <div v-if="false" ref="footer" class="footer flex auto justify-content-start align-items-center;">
         <input ref="fileInput" id="file" type="file" accept="image/*" @change="previewFiles" style="display:none; z-index:-1">
         <label for="file" class="icon icon-camera"></label>
      </div>
@@ -81,28 +81,28 @@ export default {
 
     async writePost(){
         this.$eventBus.$emit("showLoading")
-        let imgList = [], imgDescList = []
-        for(let i = 0; i<this.imgInputList.length; i++){
-          imgList.push(this.dataUriToBlob(this.imgInputList[i].src))
-          imgDescList.push(this.imgInputList[i].desc)
-        }
-        console.log("imgInputList:",this.imgInputList)
-        console.log("imgList:",imgList)
+        // let imgList = [], imgDescList = []
+        // for(let i = 0; i<this.imgInputList.length; i++){
+        //   imgList.push(this.dataUriToBlob(this.imgInputList[i].src))
+        //   imgDescList.push(this.imgInputList[i].desc)
+        // }
+        // console.log("imgInputList:",this.imgInputList)
+        // console.log("imgList:",imgList)
         
-        let imgRes
-        if(imgList.length){
-          imgRes = await this.$api.uploadImages(`upload/images`,imgList)
-        }
-        console.log("uploadres",imgRes)
+        // let imgRes
+        // if(imgList.length){
+        //   imgRes = await this.$api.uploadImages(`upload/images`,imgList)
+        // }
+        //console.log("uploadres",imgRes)
        
-       let writingRes = await this.$api.postByPath(`notice`, {
-          writer:'관리자',
+       let writingRes = await this.$api.uploadNotice({
+          writerId:'관리자',
           title:this.subject,
           text:this.content,
         })
         this.$eventBus.$emit("hideLoading")
 
-        if(writingRes.data.code == 201){
+        if(writingRes.status == 200){
           this.$router.go(-1)
         }else{
           console.error("writingRes",writingRes)

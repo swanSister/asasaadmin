@@ -34,7 +34,7 @@
           </div>
           <div class="title">{{item.title}}</div>
           
-          <div class="text">{{item.text}}</div>
+          <div class="text"><pre>{{item.text}}</pre></div>
           <div class="flex writer-content">
             <div class="writer">{{item.writerId}}</div>
             <div class="time">{{$moment(item.createdAt).format('YYYY-MM-DD')}}</div>

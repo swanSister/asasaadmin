@@ -18,6 +18,9 @@ body {
     position: fixed;
     font-size:4vw;
 }
+pre{
+    white-space: pre-wrap;
+  }
 .flex{
     display: flex;
     flex:initial;

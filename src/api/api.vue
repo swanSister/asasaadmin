@@ -37,6 +37,17 @@ export default {
       }
     })
   },
+  uploadNoticeImage:function(file,filename,text){
+    let formData = new FormData()
+    formData.append('image', file)
+    formData.append('text', text)
+
+    return axios.post(`${API_URL}/images/notice/${filename}`, formData,{
+      headers: {
+       'content-type': 'multipart/form-data' //do not forget this 
+      }
+    })
+  },
   getNotice:function(param){
     return axios.post(`${API_URL}/notice/get`,param,{
       headers: {
@@ -44,6 +55,14 @@ export default {
       }
     })
   },
+  getNoticeDetail:function(param){
+    return axios.post(`${API_URL}/notice/getDetail`,param,{
+      headers: {
+        accept: 'application/json',
+      }
+    })
+  },
+  
   deleteNotice:function(param){
     return axios.post(`${API_URL}/notice/delete`,param,{
       headers: {

@@ -28,13 +28,18 @@
       <div class="slot-refresh" slot="refresh-start"></div>
       <div class="slot-refresh" slot="refresh-active"></div>
       <div class="child">
-        <div class="notice-item" v-for="(item, index) in noticeList" :key="'noticeList'+index">
+        <div class="notice-item" v-for="(item, index) in noticeList" :key="'noticeList'+index" @click="$router.push({name:'noticeDetail', query:{noticeId:item.noticeId}})">
+          
           <div class="flex btn-content justify-content-end">
-             <div class="flex none" @click="deleteNotice(item)">삭제</div>
+             <div class="flex none" @click.stop="deleteNotice(item)">삭제</div>
           </div>
           <div class="title">{{item.title}}</div>
           
-          <div class="text"><pre>{{item.text}}</pre></div>
+          <div class="text">
+            <div>
+              {{item.text}}
+            </div>
+          </div>
           <div class="flex writer-content">
             <div class="writer">{{item.writerId}}</div>
             <div class="time">{{$moment(item.createdAt).format('YYYY-MM-DD')}}</div>
@@ -175,6 +180,12 @@ export default {
 }
 .notice-item .text{
   margin-bottom: 2vw;
+  width:100%;
+}
+.notice-item .text div{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .notice-item .writer-content{
   font-size: 3vw;

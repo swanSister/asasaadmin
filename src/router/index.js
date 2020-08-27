@@ -4,6 +4,7 @@ import Main from '@/pages/main'
 import Auth from '@/pages/auth'
 import Notice from '@/pages/notice'
 import NoticeWriting from '@/pages/noticeWriting'
+import NoticeDetail from '@/pages/noticeDetail'
 Vue.use(Router)
 
 export default new Router({
@@ -28,6 +29,11 @@ export default new Router({
       path: '/noticeWriting',
       name: 'noticeWriting',
       component: NoticeWriting
+    },
+    {
+      path: '/noticeDetail',
+      name: 'noticeDetail',
+      component: NoticeDetail
     }
   ]
 })

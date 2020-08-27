@@ -5,7 +5,7 @@
         <div class="cancel flex auto justify-content-start" @click="$router.go(-1)">
           취소
         </div>
-        <div  class="title flex auto justify-content-center align-items-center">
+        <div class="title flex auto justify-content-center align-items-center">
           공지사항
         </div>
         <div class="add flex auto justify-content-end" @click="writePost">
@@ -15,17 +15,18 @@
 
       <div ref="body" class="body">
         <textarea class="flex auto" v-model="subject" placeholder="제목을 입력해 주세요"></textarea>
-        <textarea class="input-content flex none" v-model="content" placeholder="내용을 입력해 주세요"></textarea>
+        <textarea @keypress="autosize" class="input-content flex none" v-model="content" placeholder="내용을 입력해 주세요"></textarea>
         <div class="img-list" v-for="(item, index) in imgInputList" :key="'imgInputList'+index">
           <img :src="item.src"/>
           <input v-model="item.desc" maxlength="30" placeholder="이미지에 대한 설명을 입력해주세요.(선택)"/>
         </div>
       </div>
 
-      <div v-if="false" ref="footer" class="footer flex auto justify-content-start align-items-center;">
+      <div ref="footer" class="footer flex auto justify-content-start align-items-center;">
         <input ref="fileInput" id="file" type="file" accept="image/*" @change="previewFiles" style="display:none; z-index:-1">
         <label for="file" class="icon icon-camera"></label>
      </div>
+
   </div>
 </template>
 
@@ -39,18 +40,19 @@ export default {
   
   data: function () {
     return {
+      postList:[],
       imgInputList:[],
       varUA:null,
       inputRange:null,
       title:'등록위치선택',
-      isLocationListShow:false,
-      imgList:[],
       subject:'',
       content:'',
     }
   },
   methods:{
-
+    autosize: function(e){
+      e.target.style.cssText = 'height:' + (e.target.scrollHeight) + 'px'
+    },
     dataUriToBlob(dataURI){
         var byteString = atob(dataURI.split(',')[1]);
         var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
@@ -62,7 +64,31 @@ export default {
         var blob = new Blob([ab], {type: mimeString});
         return blob;
     },
-   
+    resizeImage(image){
+      console.log("resizeImages")
+      let canvas = document.createElement("canvas"),
+      max_size = 1000,
+      // 최대 기준을 1280으로 잡음.
+      width = image.width,
+      height = image.height;
+      if (width > height) {
+        if (width > max_size) {
+          height *= max_size / width;
+          width = max_size;
+        }
+      } else {
+        if (height > max_size) {
+          width *= max_size / height;
+          height = max_size;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg")
+      console.log(dataUrl)
+      return dataUrl
+    },
     async previewFiles(event) {
       let that = this
       var oFReader = new FileReader()
@@ -71,7 +97,7 @@ export default {
            let image = new Image()
               image.src= oFREvent.target.result
               image.onload = function(){
-                let src = that.$resizeImage(image)
+                let src = that.resizeImage(image)
                 console.log(oFREvent.target.result.length, src.length)
                 let imgInputData = {src:src, desc:''}
                 that.imgInputList.push(imgInputData)
@@ -80,37 +106,30 @@ export default {
     },
 
     async writePost(){
-        this.$eventBus.$emit("showLoading")
-        // let imgList = [], imgDescList = []
-        // for(let i = 0; i<this.imgInputList.length; i++){
-        //   imgList.push(this.dataUriToBlob(this.imgInputList[i].src))
-        //   imgDescList.push(this.imgInputList[i].desc)
-        // }
-        // console.log("imgInputList:",this.imgInputList)
-        // console.log("imgList:",imgList)
-        
-        // let imgRes
-        // if(imgList.length){
-        //   imgRes = await this.$api.uploadImages(`upload/images`,imgList)
-        // }
-        //console.log("uploadres",imgRes)
-       
-       let writingRes = await this.$api.uploadNotice({
-          writerId:'관리자',
-          title:this.subject,
-          text:this.content,
-        })
-        this.$eventBus.$emit("hideLoading")
 
-        if(writingRes.status == 200){
-          this.$router.go(-1)
-        }else{
-          console.error("writingRes",writingRes)
+      let writingRes = await this.$api.uploadNotice({
+        writerId:'관리자',
+        writer:{},
+        title:this.subject,
+        text:this.content,
+      })
+
+      console.log(writingRes.data.data.noticeId)
+      
+      if(writingRes.status == 200){//notice image upload 
+        let noticeId = writingRes.data.data.noticeId
+        for(let i = 0; i<this.imgInputList.length; i++){
+          let imgRes = await this.$api.uploadNoticeImage(this.dataUriToBlob(this.imgInputList[i].src),`${noticeId}_${i}_notice`,this.imgInputList[i].desc)
+          console.log(imgRes)
         }
-    },
+        this.$router.go(-1)
+      }else{
+        console.error(writingRes)
+      }
+    }
   },
   async mounted () {
-    
+   
   }
 }
 </script>
@@ -121,10 +140,10 @@ export default {
     background:white;
   }
   .header{
-    height:14vw;
+    height:18vw;
     border-bottom:1px solid #ddd;
     padding:0 4vw;
-    font-size: 4vw;
+    font-size: 4.5vw;
   }
   .header .cancel{
     color:#000;
@@ -137,12 +156,12 @@ export default {
     margin-left:1vw;
   }
   .header .add{
-    color:tomato;
+    color:rgb(21, 134, 204) ;
   }
   .body{
     padding:2vw;
     padding-bottom:10vw;
-    height:calc(calc(var(--vh, 1vh) * 100) - 28vw);
+    height:calc(calc(var(--vh, 1vh) * 100) - 36vw);
     overflow:scroll;
   }
   .body textarea{
@@ -153,7 +172,7 @@ export default {
     overflow-y: hidden; /* fixes scrollbar flash - kudos to @brettjonesdev */
   }
   .body textarea:first-child{
-    max-height:14vw;
+    max-height:18vw;
     border-bottom:1px solid #ddd;
   }
   .body textarea:nth-child(2){
@@ -178,7 +197,7 @@ export default {
   .footer{
     width:100%;
     position:relative;
-    height:14vw;
+    height:18vw;
     border-top:1px solid #ddd;
     padding:0 4vw;
     background:white;
@@ -191,7 +210,7 @@ export default {
   .location-list{
     background:rgba(0,0,0,.5);
     width:100vw;
-    height:100vh;
+    height:100%;
     position:fixed;
     left:0;
     top:0;
@@ -212,12 +231,12 @@ export default {
     padding:3vh 0;
   }
   .location-list .list .item .name{
-    font-size:4vw;
+    font-size:4.5vw;
     font-weight: bold;
     color:#000;
   }
   .location-list .list .item .desc{
-    font-size:3vw;
+    font-size:3.5vw;
     color:#aaa;
     font-weight: bold;
     margin-top:1vw;

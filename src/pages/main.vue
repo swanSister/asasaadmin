@@ -27,7 +27,9 @@ export default {
   methods:{
   },
   async mounted(){
-   
+   if(sessionStorage.login != "success"){
+     this.$router.push('login')
+   }
   }
 }
 </script>

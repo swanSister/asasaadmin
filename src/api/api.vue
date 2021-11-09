@@ -4,6 +4,13 @@ import axios from 'axios'
 let ctx = {}
 const API_URL = "https://api.asasakorea.com"
 export default {
+  login:function(param){
+    return axios.post(`${API_URL}/admin/login`,param,{
+      headers: {
+        accept: 'application/json',
+      }
+    })
+  },
   install(Vue, options){
     ctx.store = options.store
   },

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Main from '@/pages/main'
+import Login from '@/pages/login'
 import Auth from '@/pages/auth'
 import Notice from '@/pages/notice'
 import NoticeWriting from '@/pages/noticeWriting'
@@ -12,13 +13,23 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'main',
-      component: Main
+      name: 'login',
+      component: Login
     },
     {
       path: '/auth',
       name: 'auth',
       component: Auth
+    },
+    {
+      path: '/main',
+      name: 'main',
+      component: Main
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/notice',

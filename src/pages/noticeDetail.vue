@@ -74,7 +74,12 @@ export default {
   },
   async mounted () {
    try{
+     if(sessionStorage.login != "success"){
+      this.$router.push('login')
+      }else{
       this.getNoticeDetail()
+      }
+      
    }catch(e){
      console.error(e.messages)
      alert("error")
